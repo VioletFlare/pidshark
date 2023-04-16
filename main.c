@@ -4,24 +4,30 @@
 #include <stdbool.h>
 #include "lib/sds/sds.h"
 
-bool IncludesString(sds that, sds str) {
-    return sdscmp(that, str) == 0;
-}
-
-bool IncludesString(WCHAR that, sds str) {
-
-}
-
-sds ConvertWCharToSds(WCHAR *str, size_t oldStrSize) {
+sds ConvertWCToS(WCHAR* str, size_t oldStrSize) {
     size_t i = 0;
-    char* newStr = (char*) malloc(oldStrSize);
+    char* newStr = (char*)malloc(oldStrSize);
 
     wcstombs_s(i, newStr, oldStrSize, str, oldStrSize - 1);
 
-    return sdsnew(newStr);
+    sds sdsStr = sdsnew(newStr);
+
+    free(newStr);
+
+    return sdsStr;
 }
 
+bool IncludesStringSS(sds that, sds str) {
+    return sdscmp(that, str) == 0;
+}
 
+bool IncludesStringWCS(WCHAR* that, size_t thatSize, sds str) {
+    sds thatConverted = ConvertWCToS(that, thatSize);
+    bool isIncluding = IncludesStringSS(thatConverted, str);
+    sdsfree(thatConverted);
+
+    return isIncluding;
+}
 
 bool FindRunningProcess(sds processName) {
     /*
@@ -43,18 +49,14 @@ bool FindRunningProcess(sds processName) {
         pe32.dwSize = sizeof(PROCESSENTRY32);
 
         if (Process32First(hProcessSnap, &pe32)) { // Gets first running process
-            sds currentProcessName = ConvertWCharToSds(pe32.szExeFile, sizeof(pe32.szExeFile));
-            bool isProcessFound = IncludesString(currentProcessName, processName);
-            sdsfree(currentProcessName);
+            bool isProcessFound = IncludesStringWCS(pe32.szExeFile, sizeof(pe32.szExeFile), processName);
 
             if (isProcessFound) {
                 procRunning = true;
             } else {
                 // loop through all running processes looking for process
                 while (Process32Next(hProcessSnap, &pe32)) {
-                    sds currentProcessName = ConvertWCharToSds(pe32.szExeFile, sizeof(pe32.szExeFile));
-                    bool isProcessFound = IncludesString(currentProcessName, processName);
-                    sdsfree(currentProcessName);
+                    bool isProcessFound = IncludesStringWCS(&pe32.szExeFile, sizeof(pe32.szExeFile), processName);
 
                     if (isProcessFound) {
                         // if found process is running, set to true and break from loop
@@ -72,7 +74,7 @@ bool FindRunningProcess(sds processName) {
 }
 
 void main() {
-    sds processName = sdsnew("Brave.exe");
+    sds processName = sdsnew("brave.exe");
 
     if (FindRunningProcess(processName)) {
         printf("IsRunning");
