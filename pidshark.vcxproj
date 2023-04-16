@@ -143,6 +143,7 @@
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="lib\cvector\cvector.h" />
     <ClInclude Include="lib\sds\msvccomp.h" />
     <ClInclude Include="lib\sds\sds.h" />
     <ClInclude Include="lib\sds\sdsalloc.h" />

@@ -32,5 +32,8 @@
     <ClInclude Include="lib\sds\msvccomp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="lib\cvector\cvector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
