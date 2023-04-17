@@ -5,6 +5,7 @@
 #include <iphlpapi.h>
 
 #pragma comment(lib, "iphlpapi.lib")
+#pragma comment(lib, "ws2_32.lib")
 
 #include "lib/sds/sds.h"
 #include "lib/cvector/cvector.h"
@@ -70,8 +71,8 @@ void GetListOfTcpPorts() {
     {
         owner = &pTCPInfo->table[dwLoop];
         pid = sdsfromlonglong(owner->dwOwningPid);
-        OpenedPort = sdsfromlonglong(owner->dwLocalPort);
-        RemotePort = sdsfromlonglong(owner->dwRemotePort);
+        OpenedPort = sdsfromlonglong(ntohs(owner->dwLocalPort));
+        RemotePort = sdsfromlonglong(ntohs(owner->dwRemotePort));
         cvector_vector_type(sds) args[5] = {sdsnew("TCP; "), OpenedPort, RemotePort, pid, sdsnew("\n")};
         
         aux = sdsjoinsds(args, 5, ";", 1);
