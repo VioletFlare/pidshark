@@ -9,6 +9,7 @@
 
 #include "lib/sds/sds.h"
 #include "lib/cvector/cvector.h"
+#include "types.h"
 
 
 
@@ -51,17 +52,13 @@ cvector_vector_type(unsigned int) GetTCPPorts(cvector_vector_type(unsigned int) 
     return NULL;
 }
 
-void GetListOfTcpPorts() {
-    sds pid = "";
-    sds result = sdsnew("");
-    sds aux = "";
-    sds OpenedPort = "";
-    sds RemotePort = "";
-
+cvector_vector_type(pid_port) GetListOfTcpLocalPorts() {
     MIB_TCPTABLE_OWNER_PID* pTCPInfo;
     MIB_TCPROW_OWNER_PID* owner;
     DWORD size;
     DWORD dwResult;
+   
+    cvector_vector_type(pid_port) v = NULL;
 
     dwResult = GetExtendedTcpTable(NULL, &size, true, AF_INET, TCP_TABLE_OWNER_PID_ALL, 0);
     pTCPInfo = (MIB_TCPTABLE_OWNER_PID*) malloc(size);
@@ -69,17 +66,14 @@ void GetListOfTcpPorts() {
 
     for (DWORD dwLoop = 0; dwLoop < pTCPInfo->dwNumEntries; dwLoop++)
     {
+        pid_port pidPort;
         owner = &pTCPInfo->table[dwLoop];
-        pid = sdsfromlonglong(owner->dwOwningPid);
-        OpenedPort = sdsfromlonglong(ntohs(owner->dwLocalPort));
-        RemotePort = sdsfromlonglong(ntohs(owner->dwRemotePort));
-        cvector_vector_type(sds) args[5] = {sdsnew("TCP; "), OpenedPort, RemotePort, pid, sdsnew("\n")};
-        
-        aux = sdsjoinsds(args, 5, ";", 1);
-        result = sdscatsds(result, aux);
+        pidPort.pid = owner->dwOwningPid;
+        pidPort.port = ntohs(owner->dwLocalPort);
+        cvector_push_back(v, pidPort);
     }
 
-    printf(result);
+    return v;
 }
 
 cvector_vector_type(unsigned int) FindRunningPids(sds processName) {
@@ -120,7 +114,7 @@ void main() {
     cvector_vector_type(unsigned int) pids = FindRunningPids(processName);
     
     GetTCPPorts(pids);
-    GetListOfTcpPorts();
+    GetListOfTcpLocalPorts();
 
     cvector_free(pids);
     sdsfree(processName);
