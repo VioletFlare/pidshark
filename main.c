@@ -1,11 +1,16 @@
-#include <windows.h>
-#include <tlhelp32.h>
 #include <stdio.h>
 #include <stdbool.h>
+
+#include <WinSock2.h>
+
+#include <windows.h>
+#include <ws2tcpip.h>
 #include <iphlpapi.h>
 
 #pragma comment(lib, "iphlpapi.lib")
 #pragma comment(lib, "ws2_32.lib")
+
+#include <tlhelp32.h>
 
 #include "lib/sds/sds.h"
 #include "lib/cvector/cvector.h"
@@ -38,47 +43,10 @@ bool IncludesStringWCS(WCHAR* that, size_t thatSize, sds str) {
     return isIncluding;
 }
 
-cvector_vector_type(unsigned int) GetTCPPorts(cvector_vector_type(unsigned int) pids) {
-    HANDLE hProcess;
 
-    if (pids) {
-        size_t i;
-        for (i = 0; i < cvector_size(pids); ++i) {
-           hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pids[i]);
-           CloseHandle(hProcess);
-        }
-    }
-
-    return NULL;
-}
-
-cvector_vector_type(pid_port) GetListOfTcpLocalPorts() {
-    MIB_TCPTABLE_OWNER_PID* pTCPInfo;
-    MIB_TCPROW_OWNER_PID* owner;
-    DWORD size;
-    DWORD dwResult;
-   
-    cvector_vector_type(pid_port) v = NULL;
-
-    dwResult = GetExtendedTcpTable(NULL, &size, true, AF_INET, TCP_TABLE_OWNER_PID_ALL, 0);
-    pTCPInfo = (MIB_TCPTABLE_OWNER_PID*) malloc(size);
-    dwResult = GetExtendedTcpTable(pTCPInfo, &size, true, AF_INET, TCP_TABLE_OWNER_PID_ALL, 0);
-
-    for (DWORD dwLoop = 0; dwLoop < pTCPInfo->dwNumEntries; dwLoop++)
-    {
-        pid_port pidPort;
-        owner = &pTCPInfo->table[dwLoop];
-        pidPort.pid = owner->dwOwningPid;
-        pidPort.port = ntohs(owner->dwLocalPort);
-        cvector_push_back(v, pidPort);
-    }
-
-    return v;
-}
 
 cvector_vector_type(unsigned int) FindRunningPids(sds processName) {
     bool procRunning = false;
-
     HANDLE hProcessSnap;
     PROCESSENTRY32 pe32;
     hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -112,9 +80,8 @@ cvector_vector_type(unsigned int) FindRunningPids(sds processName) {
 void main() {
     sds processName = sdsnew("brave.exe");
     cvector_vector_type(unsigned int) pids = FindRunningPids(processName);
-    
-    GetTCPPorts(pids);
-    GetListOfTcpLocalPorts();
+
+    GetListOfLocalPorts();
 
     cvector_free(pids);
     sdsfree(processName);
