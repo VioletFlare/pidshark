@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -147,7 +147,10 @@
     <ClInclude Include="lib\sds\msvccomp.h" />
     <ClInclude Include="lib\sds\sds.h" />
     <ClInclude Include="lib\sds\sdsalloc.h" />
+    <ClInclude Include="ports.h" />
+    <ClInclude Include="process.h" />
     <ClInclude Include="types.h" />
+    <ClInclude Include="utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

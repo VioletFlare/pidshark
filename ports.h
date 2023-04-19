@@ -1,4 +1,12 @@
-#include <windows.h>
+#ifndef PIDSHARK_PORTS_H
+#define PIDSHARK_PORTS_H
+
+#include <WinSock2.h>
+#include <ws2tcpip.h>
+#include <iphlpapi.h>
+
+#pragma comment(lib, "iphlpapi.lib")
+#pragma comment(lib, "ws2_32.lib")
 
 #include "lib/cvector/cvector.h"
 #include "types.h";
@@ -54,7 +62,7 @@ void EnrichPidPortVectorUDP4(cvector_vector_type(pid_port)* v) {
     MIB_UDPROW_OWNER_PID* ownerUDP;
 
     dwResult = GetExtendedUdpTable(NULL, &size, true, AF_INET, UDP_TABLE_OWNER_PID, 0);
-    pUDPInfo = (MIB_UDP6TABLE_OWNER_PID*)malloc(size);
+    pUDPInfo = (MIB_UDPTABLE_OWNER_PID*)malloc(size);
     dwResult = GetExtendedUdpTable(pUDPInfo, &size, true, AF_INET, UDP_TABLE_OWNER_PID, 0);
 
     for (DWORD dwLoop = 0; dwLoop < pUDPInfo->dwNumEntries; dwLoop++)
@@ -101,3 +109,5 @@ cvector_vector_type(pid_port) GetListOfLocalPorts() {
 
     return v;
 }
+
+#endif
