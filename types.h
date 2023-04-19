@@ -9,6 +9,7 @@
 typedef struct pid_port {
 	DWORD pid;
 	u_short port;
+	sds type;
 } pid_port;
 
 #endif

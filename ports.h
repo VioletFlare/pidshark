@@ -27,6 +27,7 @@ void EnrichPidPortVectorTCP4(cvector_vector_type(pid_port)* v) {
         ownerTCP4 = &pTCP4Info->table[dwLoop];
         pidPort.pid = ownerTCP4->dwOwningPid;
         pidPort.port = ntohs(ownerTCP4->dwLocalPort);
+        pidPort.type = sdsnew("TCP");
         cvector_push_back(*v, pidPort);
     }
 
@@ -49,6 +50,7 @@ void EnrichPidPortVectorTCP6(cvector_vector_type(pid_port)* v) {
         ownerTCP6 = &pTCP6Info->table[dwLoop];
         pidPort.pid = ownerTCP6->dwOwningPid;
         pidPort.port = ntohs(ownerTCP6->dwLocalPort);
+        pidPort.type = sdsnew("TCP");
         cvector_push_back(*v, pidPort);
     }
 
@@ -71,6 +73,7 @@ void EnrichPidPortVectorUDP4(cvector_vector_type(pid_port)* v) {
         ownerUDP = &pUDPInfo->table[dwLoop];
         pidPort.pid = ownerUDP->dwOwningPid;
         pidPort.port = ntohs(ownerUDP->dwLocalPort);
+        pidPort.type = sdsnew("UDP");
         cvector_push_back(*v, pidPort);
     }
 
@@ -93,6 +96,7 @@ void EnrichPidPortVectorUDP6(cvector_vector_type(pid_port)* v) {
         ownerUDP6 = &pUDP6Info->table[dwLoop];
         pidPort.pid = ownerUDP6->dwOwningPid;
         pidPort.port = ntohs(ownerUDP6->dwLocalPort);
+        pidPort.type = sdsnew("UDP");
         cvector_push_back(*v, pidPort);
     }
 
