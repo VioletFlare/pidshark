@@ -11,7 +11,7 @@
 #include "lib/cvector/cvector.h"
 #include "types.h";
 
-void EnrichPidPortVectorTCP4(cvector_vector_type(pid_port)* v) {
+size_t EnrichPidPortVectorTCP4(cvector_vector_type(pid_port)* v) {
     DWORD size = 0;
     DWORD dwResult = 0;
     MIB_TCPTABLE_OWNER_PID* pTCP4Info;
@@ -31,10 +31,14 @@ void EnrichPidPortVectorTCP4(cvector_vector_type(pid_port)* v) {
         cvector_push_back(*v, pidPort);
     }
 
+    size_t vectorSize = pTCP4Info->dwNumEntries;
+
     free(pTCP4Info);
+
+    return vectorSize;
 }
 
-void EnrichPidPortVectorTCP6(cvector_vector_type(pid_port)* v) {
+size_t EnrichPidPortVectorTCP6(cvector_vector_type(pid_port)* v) {
     DWORD size = 0;
     DWORD dwResult = 0;
     MIB_TCP6TABLE_OWNER_PID* pTCP6Info;
@@ -54,10 +58,14 @@ void EnrichPidPortVectorTCP6(cvector_vector_type(pid_port)* v) {
         cvector_push_back(*v, pidPort);
     }
 
+    size_t vectorSize = pTCP6Info->dwNumEntries;
+
     free(pTCP6Info);
+
+    return vectorSize;
 }
 
-void EnrichPidPortVectorUDP4(cvector_vector_type(pid_port)* v) {
+size_t EnrichPidPortVectorUDP4(cvector_vector_type(pid_port)* v) {
     DWORD size = 0;
     DWORD dwResult = 0;
     MIB_UDPTABLE_OWNER_PID* pUDPInfo;
@@ -77,18 +85,22 @@ void EnrichPidPortVectorUDP4(cvector_vector_type(pid_port)* v) {
         cvector_push_back(*v, pidPort);
     }
 
+    size_t vectorSize = pUDPInfo->dwNumEntries;
+
     free(pUDPInfo);
+
+    return vectorSize;
 }
 
-void EnrichPidPortVectorUDP6(cvector_vector_type(pid_port)* v) {
+size_t EnrichPidPortVectorUDP6(cvector_vector_type(pid_port)* v) {
     DWORD size = 0;
     DWORD dwResult = 0;
     MIB_UDP6TABLE_OWNER_PID* pUDP6Info;
     MIB_UDP6ROW_OWNER_PID* ownerUDP6;
 
-    dwResult = GetExtendedUdpTable(NULL, &size, true, AF_INET, UDP_TABLE_OWNER_PID, 0);
+    dwResult = GetExtendedUdpTable(NULL, &size, true, AF_INET6, UDP_TABLE_OWNER_PID, 0);
     pUDP6Info = (MIB_UDP6TABLE_OWNER_PID*)malloc(size);
-    dwResult = GetExtendedUdpTable(pUDP6Info, &size, true, AF_INET, UDP_TABLE_OWNER_PID, 0);
+    dwResult = GetExtendedUdpTable(pUDP6Info, &size, true, AF_INET6, UDP_TABLE_OWNER_PID, 0);
 
     for (DWORD dwLoop = 0; dwLoop < pUDP6Info->dwNumEntries; dwLoop++)
     {
@@ -100,18 +112,22 @@ void EnrichPidPortVectorUDP6(cvector_vector_type(pid_port)* v) {
         cvector_push_back(*v, pidPort);
     }
 
+    size_t vectorSize = pUDP6Info->dwNumEntries;
+
     free(pUDP6Info);
+
+    return vectorSize;
 }
 
-cvector_vector_type(pid_port) GetListOfLocalPorts() {
-    cvector_vector_type(pid_port) v = NULL;
+size_t GetListOfLocalPorts(cvector_vector_type(pid_port)* v) {
+    size_t size = 0;
 
-    EnrichPidPortVectorTCP4(&v);
-    EnrichPidPortVectorTCP6(&v);
-    EnrichPidPortVectorUDP4(&v);
-    EnrichPidPortVectorUDP6(&v);
+    size += EnrichPidPortVectorTCP4(v);
+    size += EnrichPidPortVectorTCP6(v);
+    size += EnrichPidPortVectorUDP4(v);
+    size += EnrichPidPortVectorUDP6(v);
 
-    return v;
+    return size;
 }
 
 #endif

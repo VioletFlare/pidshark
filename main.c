@@ -7,27 +7,23 @@
 #include "types.h"
 #include "process.h"
 
-cvector_vector_type(pid_port) FilterPidPortsByPids(cvector_vector_type(pid_port) pidPorts, cvector_vector_type(unsigned int) pids) {
-    cvector_vector_type(pid_port) filteredPidPorts = NULL;
-    
-    int pidsLength = cvector_size(pids) / sizeof(unsigned int);
-    int pidPortsLength = cvector_size(pidPorts) / sizeof(pid_port);
+size_t FilterPidPortsByPids(cvector_vector_type(pid_port) *filteredPidPorts, cvector_vector_type(pid_port) pidPorts, size_t pidPortNum, cvector_vector_type(unsigned int) pids, size_t pidsNum) {
+    size_t filteredPidPortsNum = 0;
 
-    for (int i = 0; i < pidsLength; i++) {
-        for (int j = 0; j < pidPortsLength; j++) {
+    for (int i = 0; i < pidsNum; i++) {
+        for (int j = 0; j < pidPortNum; j++) {
             if (pids[i] == pidPorts[j].pid) {
-                cvector_push_back(filteredPidPorts, pidPorts[j]);
+                cvector_push_back(*filteredPidPorts, pidPorts[j]);
+                filteredPidPortsNum++;
             }
         }
     }
     
-    return filteredPidPorts;
+    return filteredPidPortsNum;
 }
 
-void PrintFilters(cvector_vector_type(pid_port) pidPorts) {
-    int pidPortsLength = cvector_size(pidPorts) / sizeof(pid_port);
-
-    for (int i = 0; i < pidPortsLength; i++) {
+void PrintFilters(cvector_vector_type(pid_port) pidPorts, size_t filteredPidPortsNum) {
+    for (int i = 0; i < filteredPidPortsNum; i++) {
         bool isTCP = IncludesStringSC(pidPorts[i].type, "TCP");
 
         if (isTCP) {
@@ -36,25 +32,31 @@ void PrintFilters(cvector_vector_type(pid_port) pidPorts) {
             printf("udp.port == % u", pidPorts[i].port);
         }
 
-        if (i < (pidPortsLength - 1)) {
+        if (i < (filteredPidPortsNum - 1)) {
             printf(" || ");
         }
     }
 }
 
-void main() {
-    sds processName = sdsnew("brave.exe");
-    cvector_vector_type(unsigned int) pids = FindRunningPids(processName);
+void main(int argc, char *argv[]) {
+    sds processName = sdsnew(argv[1]);
+    cvector_vector_type(unsigned int) pids = NULL;
+    
+    size_t pidsNum = FindRunningPids(&pids, processName);
 
     sdsfree(processName);
 
-    cvector_vector_type(pid_port) localPidPorts = GetListOfLocalPorts();
-    cvector_vector_type(pid_port) filteredPidPorts = FilterPidPortsByPids(localPidPorts, pids);
+    cvector_vector_type(pid_port) localPidPorts = NULL;
+
+    size_t pidPortNum = GetListOfLocalPorts(&localPidPorts);
+
+    cvector_vector_type(pid_port) filteredPidPorts = NULL;
+    size_t filteredPidPortsNum = FilterPidPortsByPids(&filteredPidPorts, localPidPorts, pidPortNum, pids, pidsNum);
     
     cvector_free(pids);
     cvector_free(localPidPorts);
 
-    PrintFilters(filteredPidPorts);
+    PrintFilters(filteredPidPorts, filteredPidPortsNum);
 
     cvector_free(filteredPidPorts);
 }
