@@ -119,6 +119,16 @@ size_t EnrichPidPortVectorUDP6(cvector_vector_type(pid_port)* v) {
     return vectorSize;
 }
 
+void FreePidPortsVector(cvector_vector_type(pid_port) pidPorts, size_t pidPortsNum) {
+
+    for (int i = 0; i < pidPortsNum; i++) {
+        sdsfree(pidPorts[i].type);
+    }
+
+    cvector_free(pidPorts);
+
+}
+
 size_t GetListOfLocalPorts(cvector_vector_type(pid_port)* v) {
     size_t size = 0;
 

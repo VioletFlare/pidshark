@@ -54,9 +54,10 @@ void main(int argc, char *argv[]) {
     size_t filteredPidPortsNum = FilterPidPortsByPids(&filteredPidPorts, localPidPorts, pidPortNum, pids, pidsNum);
     
     cvector_free(pids);
-    cvector_free(localPidPorts);
 
     PrintFilters(filteredPidPorts, filteredPidPortsNum);
+
+    FreePidPortsVector(localPidPorts, pidPortNum);
 
     cvector_free(filteredPidPorts);
 }
