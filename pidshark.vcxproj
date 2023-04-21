@@ -140,17 +140,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="lib\sds\sds.c" />
-    <ClCompile Include="main.c" />
+    <ClCompile Include="src\main.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\cvector\cvector.h" />
     <ClInclude Include="lib\sds\msvccomp.h" />
     <ClInclude Include="lib\sds\sds.h" />
     <ClInclude Include="lib\sds\sdsalloc.h" />
-    <ClInclude Include="ports.h" />
-    <ClInclude Include="process.h" />
-    <ClInclude Include="types.h" />
-    <ClInclude Include="utils.h" />
+    <ClInclude Include="src\ports.h" />
+    <ClInclude Include="src\process.h" />
+    <ClInclude Include="src\types.h" />
+    <ClInclude Include="src\utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

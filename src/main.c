@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#include "lib/sds/sds.h"
-#include "lib/cvector/cvector.h"
+#include "../lib/sds/sds.h"
+#include "../lib/cvector/cvector.h"
 #include "ports.h"
 #include "types.h"
 #include "process.h"

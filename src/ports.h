@@ -8,7 +8,7 @@
 #pragma comment(lib, "iphlpapi.lib")
 #pragma comment(lib, "ws2_32.lib")
 
-#include "lib/cvector/cvector.h"
+#include "../lib/cvector/cvector.h"
 #include "types.h";
 
 size_t EnrichPidPortVectorTCP4(cvector_vector_type(pid_port)* v) {
